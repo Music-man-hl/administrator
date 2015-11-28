@@ -53,29 +53,38 @@ class QiniuUploadProvider extends ServiceProvider
     private function multiFilesUpload()
     {
         Form::macro('multi_file_upload', function ($name, $label, $with_description=true, $percent=0.5,$platform="qiniu") {
+
             $value = ForoneFormServiceProvider::parseValue($this->model, $name);
+            //dd($value);
             $url = '/vendor/forone/images/upload_add.png';
             $uploaded_items = '';
-            if ($value) {
-                $items = explode('|', $value);
-                foreach ($items as $item) {
-                    $details = explode('~', $item);
+            if (is_array($value)) {
+                //$items = explode('|', $value);
+                foreach ($value as $item) {
+                    $attach_id=$item['id'];
+                    $attach_url=$item['attach_url'];
+                    $attach_name=$item['attach_name'];
+                    //$details = $item['attach_url'];
                     $idvalue = rand().'';
                     $div = '<div id="'.$idvalue.'div" style="float:left;width:68px;margin-right: 20px">';
-                    if(preg_match("/.pdf/", $details[0])){
+                    if(preg_match("/.pdf/", $attach_url)){
                         $img = '<img onclick="removeMultiUploadItem(\'' . $idvalue . 'div\',\''.$name.'\')" style="width: 68px; height: 68px;cursor:pointer"
                         src="/vendor/forone/images/upload.png">';
                     }else{
                         $img = '<img onclick="removeMultiUploadItem(\'' . $idvalue . 'div\',\''.$name.'\')" style="width: 68px; height: 68px;cursor:pointer"
-                        src="'.config('forone.qiniu.host').$details[0].'?imageView2/1/w/68/h/68">';
+                        src="'.$attach_url.'?imageView2/1/w/68/h/68">';
                     }
 
                     $uploaded_items .= $div . $img;
                     $v = '';
-                    if (sizeof($details) == 2) {
-                        $v = "value='$details[1]'";
+                    if (isset($item['attach_name'])) {
+                        $v = "value='$attach_name'";
                     }
-                    $uploaded_items .= '<input '.$v.' type="hidden" onkeyup="fillMultiUploadInput(\''.$name.'\')" style="width: 68px;float: left" placeholder="图片描述"></div>';
+                    $uploaded_items.='<input type="hidden" name="'.$name.'['.$attach_id.'][attach_url]" value="'.config('forone.qiniu.host').$attach_url.'">';
+                    $uploaded_items.='<input type="hidden" name="'.$name.'['.$attach_id.'][id]" value="'.$attach_id.'">';
+                    $uploaded_items.='<input  name="'.$name.'['.$attach_id.'][env_type]" value="'.$item["env_type"].'" placeholder="应用场景" style="width: 68px;float: left">';
+                    $uploaded_items.='<input  name="'.$name.'['.$attach_id.'][oid]" value="'.$item["oid"].'" placeholder="附件排序" style="width: 68px;float: left">';
+                    $uploaded_items .= '<input '.$v.'  onkeyup="fillMultiUploadInput(\''.$name.'\')" name="'.$name.'['.$attach_id.'][attach_name]" style="width: 68px;float: left" placeholder="图片描述"></div>';
                 }
             }
 
@@ -88,7 +97,7 @@ class QiniuUploadProvider extends ServiceProvider
             return $js.'<div class="form-group col-sm-' . ($percent * 12) . '">
                         ' . Form::form_label($label) . '
                         <div class="col-sm-9">
-                            <input id="'.$name.'" type="hidden" name="' . $name . '" type="text" value="'.$value.'">
+                            <input id="'.$name.'" type="hidden" name="' . $name . '" type="text" value="">
                             <img style="width:58px;height:58px;cursor:pointer;float:left;margin-right:20px;" id="'.$name.'_img" src="'.$url.'">
                             <label id="'.$name.'_label"></label>
                             <div id="'.$name.'_div">'.$uploaded_items.'</div>
