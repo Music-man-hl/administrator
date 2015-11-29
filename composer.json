@@ -1,7 +1,7 @@
 {
-  "name": "forone/administrator",
+  "name": "aishan/administrator",
   "description": "Admin system based on Laravel 5.1",
-  "homepage": "https://github.com/ForoneTech/LaravelAdmin",
+  "homepage": "https://github.com/aishan/ForoneAdministrator",
   "keywords": ["laravel 5", "forone", "admin"],
   "type": "library",
   "license": "MIT",
@@ -13,10 +13,14 @@
     {
       "name": "Mani Wang",
       "email": "mani@forone.co"
+    },
+    {
+      "name": "Ai Shan",
+      "email": "aishan520315@163.com"
     }
   ],
   "support": {
-    "issues": "https://github.com/ForoneTech/LaravelAdmin/issues"
+    "issues": "https://github.com/aishan/ForoneAdministrator/issues"
   },
   "require": {
     "php": ">=5.5.9",
