@@ -689,7 +689,7 @@
                         /* 添加额外的GET参数 */
                         var params = utils.serializeParam(editor.queryCommandValue('serverparam')) || '',
                             url = utils.formatUrl(actionUrl + (actionUrl.indexOf('?') == -1 ? '?':'&') + 'encode=utf-8&' + params);
-                        uploader.option('server', url);
+                        uploader.option('server', editor.getOpt('imageUrl'));
                         setState('uploading', files);
                         break;
                     case 'stopUpload':
@@ -701,7 +701,28 @@
             uploader.on('uploadBeforeSend', function (file, data, header) {
                 //这里可以通过data对象添加POST参数
                 header['X_Requested_With'] = 'XMLHttpRequest';
+                var type = editor.getOpt('imageSaveType');
+                //生成一个随机数目，防止批量上传的时候文件名同名出错
+                var randNumber = Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*20).toString();
+                if(type == 'date'){
+                var filename = Date.parse(new Date())+randNumber+"."+file.file.ext;
+                    data['key'] = filename;
+                }else{
+                    var filename = file.file.name;
+                    data['key'] = filename;
+                }
+                var token ="";
+                $.ajax({
+                dataType:'text',
+                async:false,
+                url:"../../php/getToken.php?key="+filename,
+                            success:function(data) {
+                                token = data;
+                            }
+                });
+                data['token'] = token;
             });
+
 
             uploader.on('uploadProgress', function (file, percentage) {
                 var $li = $('#' + file.id),
@@ -718,7 +739,7 @@
                     var responseText = (ret._raw || ret),
                         json = utils.str2json(responseText);
                     if (json.state == 'SUCCESS') {
-                        _this.imageList.push(json);
+                        _this.imageList[$file.index()] = json;//指定键值防止乱序
                         $file.append('<span class="success"></span>');
                     } else {
                         $file.find('.error').text(json.state).show();
