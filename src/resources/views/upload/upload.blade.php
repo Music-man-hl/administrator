@@ -17,15 +17,20 @@
                         @if(isset($multi))
                         var reader = new FileReader();
                         reader.onload = function(e){
+                            console.log(file);
+                            name=name+"["+file.id+"]";
                             var item = '<div id="'+file.id+'div" style="float:left;width:68px;margin-right: 20px">' +
                                     '<img ' +
                                     'onclick="removeMultiUploadItem(\''+file.id+'div\',\''+name+'\')" ' +
                                     'id="'+file.id+'" ' +
                                     'style="width: 68px; height: 68px;cursor:pointer" ' +
                                     'src="'+ e.target.result+'">' +
-                                    '<img id="'+file.id+'loading" src="/vendor/forone/components/qiniu/loading.gif">';
+                                    '<img id="'+file.id+'loading" src="/vendor/forone/components/qiniu/loading.gif">' +
+                                    '<input  name="'+name+'[attach_url]"  type="hidden" value="'+"{{config('forone.qiniu.host')}}" + file.target_name+'">';
                             @if(isset($with_description) && $with_description)
-                                item+='<input type="text" onkeyup="fillMultiUploadInput(\''+name+'\')" style="width: 68px;float: left" placeholder="图片描述">';
+                                item+= '<input  name="'+name+'[env_type]"  placeholder="应用场景" style="width: 68px;float: left">'
+                                    +'<input  name="'+name+'[oid]"  placeholder="排序" style="width: 68px;float: left">'
+                                    +'<input type="text" onkeyup="fillMultiUploadInput('+name+')" name="'+name+'[attach_name]" style="width: 68px;float: left" placeholder="附件名称">';
                             @else
                                 item+='</div>';
                             @endif

@@ -71,7 +71,7 @@ class BaseController extends Controller
     protected function redirectWithError($error)
     {
         return redirect()->to($this->getRedirectUrl())
-            ->withErrors(['default' => $error]);
+            ->withErrors(['default' => $error])->withInput(\Input::all());
     }
 
     protected function toIndex($alert='')

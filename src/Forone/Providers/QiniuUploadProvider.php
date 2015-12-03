@@ -80,11 +80,11 @@ class QiniuUploadProvider extends ServiceProvider
                     if (isset($item['attach_name'])) {
                         $v = "value='$attach_name'";
                     }
-                    $uploaded_items.='<input type="hidden" name="'.$name.'['.$attach_id.'][attach_url]" value="'.config('forone.qiniu.host').$attach_url.'">';
+                    $uploaded_items.='<input type="hidden" name="'.$name.'['.$attach_id.'][attach_url]" value="'.$attach_url.'">';
                     $uploaded_items.='<input type="hidden" name="'.$name.'['.$attach_id.'][id]" value="'.$attach_id.'">';
                     $uploaded_items.='<input  name="'.$name.'['.$attach_id.'][env_type]" value="'.$item["env_type"].'" placeholder="应用场景" style="width: 68px;float: left">';
-                    $uploaded_items.='<input  name="'.$name.'['.$attach_id.'][oid]" value="'.$item["oid"].'" placeholder="附件排序" style="width: 68px;float: left">';
-                    $uploaded_items .= '<input '.$v.'  onkeyup="fillMultiUploadInput(\''.$name.'\')" name="'.$name.'['.$attach_id.'][attach_name]" style="width: 68px;float: left" placeholder="图片描述"></div>';
+                    $uploaded_items.='<input  name="'.$name.'['.$attach_id.'][oid]" value="'.$item["oid"].'" placeholder="排序" style="width: 68px;float: left">';
+                    $uploaded_items .= '<input '.$v.'  onkeyup="fillMultiUploadInput(\''.$name.'\')" name="'.$name.'['.$attach_id.'][attach_name]" style="width: 68px;float: left" placeholder="附件名称"></div>';
                 }
             }
 
