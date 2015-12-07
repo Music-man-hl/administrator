@@ -28,7 +28,7 @@
                                     '<img id="'+file.id+'loading" src="/vendor/forone/components/qiniu/loading.gif">' +
                                     '<input  name="'+name+'[attach_url]"  type="hidden" value="'+"{{config('forone.qiniu.host')}}" + file.target_name+'">';
                             @if(isset($with_description) && $with_description)
-                                item+= '<input  name="'+name+'[env_type]"  placeholder="应用场景" style="width: 68px;float: left">'
+                                item+= '<input  name="'+name+'[env_type]"  placeholder="0:pc 1:h5" style="width: 68px;float: left">'
                                     +'<input  name="'+name+'[oid]"  placeholder="排序" style="width: 68px;float: left">'
                                     +'<input type="text" onkeyup="fillMultiUploadInput('+name+')" name="'+name+'[attach_name]" style="width: 68px;float: left" placeholder="附件名称">';
                             @else
