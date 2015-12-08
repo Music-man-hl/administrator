@@ -1,6 +1,5 @@
 <script type='text/javascript'>
     init.push(function(){
-        var name = "{{$name}}";
         Qiniu.uploader({
             browse_button: "{{$name}}_img",
             uptoken_url: '{{ route("admin.qiniu.upload-token") }}',
