@@ -1,5 +1,6 @@
 <script type='text/javascript'>
     init.push(function(){
+
         Qiniu.uploader({
             browse_button: "{{$name}}_img",
             uptoken_url: '{{ route("admin.qiniu.upload-token") }}',
@@ -12,20 +13,28 @@
             auto_start: true,
             init: {
                 'FilesAdded': function(up, files) {
+                    //console.log(files);
                     plupload.each(files, function(file) {
                         @if(isset($multi))
                         var reader = new FileReader();
                         reader.onload = function(e){
-                            console.log(file);
+                            //console.log(file);
+                            //console.log(e);
+                            var matches = file.name.match(/\.([^.]+)$/), ext = "part";
+                            if (matches) {
+                                ext = matches[1];
+                            }
+                            var newFileName=file.id+ '.' + ext;
+                            var name = "{{$name}}";
                             name=name+"["+file.id+"]";
                             var item = '<div id="'+file.id+'div" style="float:left;width:68px;margin-right: 20px">' +
                                     '<img ' +
-                                    'onclick="removeMultiUploadItem(\''+file.id+'div\',\''+name+'\')" ' +
+                                    'onclick="removeMultiUploadItem('+file.id+'div,'+name+')" ' +
                                     'id="'+file.id+'" ' +
                                     'style="width: 68px; height: 68px;cursor:pointer" ' +
                                     'src="'+ e.target.result+'">' +
                                     '<img id="'+file.id+'loading" src="/vendor/forone/components/qiniu/loading.gif">' +
-                                    '<input  name="'+name+'[attach_url]"  type="hidden" value="'+"{{config('forone.qiniu.host')}}" + file.target_name+'">';
+                                    '<input  name="'+name+'[attach_url]"  type="hidden" value="'+"{{config('forone.qiniu.host')}}" + newFileName+'">';
                             @if(isset($with_description) && $with_description)
                                 item+= '<input  name="'+name+'[env_type]"  placeholder="0:pc 1:h5" style="width: 68px;float: left">'
                                     +'<input  name="'+name+'[oid]"  placeholder="排序" style="width: 68px;float: left">'
