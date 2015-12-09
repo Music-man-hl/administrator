@@ -68,10 +68,10 @@ class QiniuUploadProvider extends ServiceProvider
                     $idvalue = rand().'';
                     $div = '<div id="'.$idvalue.'div" style="float:left;width:68px;margin-right: 20px">';
                     if(preg_match("/.pdf/", $attach_url)){
-                        $img = '<img onclick="removeMultiUploadItem(\'' . $idvalue . 'div\',\''.$name.'\')" style="width: 68px; height: 68px;cursor:pointer"
+                        $img = '<img onclick="removeMultiUploadItem(this)" style="width: 68px; height: 68px;cursor:pointer"
                         src="/vendor/forone/images/upload.png">';
                     }else{
-                        $img = '<img onclick="removeMultiUploadItem(\'' . $idvalue . 'div\',\''.$name.'\')" style="width: 68px; height: 68px;cursor:pointer"
+                        $img = '<img onclick="removeMultiUploadItem(this)" style="width: 68px; height: 68px;cursor:pointer"
                         src="'.$attach_url.'?imageView2/1/w/68/h/68">';
                     }
 

@@ -24,12 +24,12 @@
                             if (matches) {
                                 ext = matches[1];
                             }
-                            var newFileName=file.id+ '.' + ext;
+                            var newFileName=file.id+ '.' + ext.toLowerCase();
                             var name = "{{$name}}";
                             name=name+"["+file.id+"]";
                             var item = '<div id="'+file.id+'div" style="float:left;width:68px;margin-right: 20px">' +
                                     '<img ' +
-                                    'onclick="removeMultiUploadItem('+file.id+'div,'+name+')" ' +
+                                    'onclick="removeMultiUploadItem(this)" ' +
                                     'id="'+file.id+'" ' +
                                     'style="width: 68px; height: 68px;cursor:pointer" ' +
                                     'src="'+ e.target.result+'">' +

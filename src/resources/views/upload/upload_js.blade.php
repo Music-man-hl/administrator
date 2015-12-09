@@ -19,8 +19,9 @@
         $('#'+filed_name).attr('value', value);
     }
 
-    function removeMultiUploadItem(id, name){
-        $('#'+id).remove();
-        fillMultiUploadInput(name);
+    function removeMultiUploadItem(obj){
+        $(obj).parent().remove();
+
+        //fillMultiUploadInput(name);
     }
 </script>
