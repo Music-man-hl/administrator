@@ -27,7 +27,7 @@
 
     <script src="{{ asset('vendor/forone/libs/jquery/jquery/dist/jquery.js') }}"></script>
     <script src="{{ asset("vendor/forone/ueditor/ueditor.config.js") }}"></script>
-    <script src="{{ asset("vendor/forone/ueditor/ueditor.all.js") }}"></script>
+    <script src="{{ asset("vendor/forone/ueditor/ueditor.all.min.js") }}"></script>
 
     <style>
         input {

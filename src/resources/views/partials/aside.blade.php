@@ -21,7 +21,7 @@
                                     @foreach(config('forone.menus') as $title => $value)
                                         @if($ns->checkPermission($value))
                                         <li class="{{ $ns->isActive($value) }}">
-                                            <a md-ink-ripple @if(array_key_exists('uri', $value)) href='{{ '/admin/'.$value['uri'] }}' @endif >
+                                            <a md-ink-ripple @if(array_key_exists('uri', $value)) href='{{ '/'.$value['uri'] }}' @endif >
                                                 <i class="icon {{ $value['icon'] }} i-20"></i>
                                                 @if(array_key_exists('children', $value) && count($value['children']))
                                                     <span class="pull-right text-muted">
@@ -34,7 +34,7 @@
                                                 <ul class="nav nav-sub">
                                                     @foreach($value['children'] as $childTitle => $chidrenValue)
                                                         <li class="{{ $ns->isActive($chidrenValue) }}">
-                                                            <a md-ink-ripple href='{{ '/admin/'.$chidrenValue['uri'] }}'>{{ $childTitle }}</a>
+                                                            <a md-ink-ripple href='{{ '/'.$chidrenValue['uri'] }}'>{{ $childTitle }}</a>
                                                         </li>
                                                     @endforeach
                                                 </ul>
