@@ -33,7 +33,7 @@ class QiniuUploadProvider extends ServiceProvider
     {
         $handler = function ($name, $label, $percent = 0.5,$platform="qiniu") {
             $value = ForoneFormServiceProvider::parseValue($this->model, $name);
-            $url = $value ? config('forone.qiniu.host') . $value : '/vendor/forone/images/upload_add.png';
+            $url = $value ? $value : '/vendor/forone/images/upload_add.png';
             $js = View::make('forone::upload.upload')->with(['name'=>$name])->render();
             if(!QiniuUploadProvider::$single_inited){
                 $js = View::make('forone::upload.upload_js')->render() . $js;
@@ -42,7 +42,7 @@ class QiniuUploadProvider extends ServiceProvider
             return $js.'<div class="form-group col-sm-' . ($percent * 12) . '">
                         ' . Form::form_label($label) . '
                         <div class="col-sm-9">
-                            <input id="' . $name . '" type="hidden" name="' . $name . '" type="text" value="' . $value . '">
+                            <input id="' . $name . '" type="hidden" name="' . $name . '" type="text" value="' . $url . '">
                             <img style="width:58px;height:58px;cursor:pointer;" id="' . $name . '_img" src="' . $url . '">
                         </div>
                     </div>';

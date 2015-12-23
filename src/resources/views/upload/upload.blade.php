@@ -58,7 +58,7 @@
                     var sourceLink = domain + res.key;
                     @if(!isset($multi))
                     $("#{{$name}}_img").attr("src",sourceLink+'?imageView2/1/w/68/h/68');
-                    $("#{{$name}}").attr("value",res.key);
+                    $("#{{$name}}").attr("value",sourceLink);
                     @else
                         $("#"+file.id).attr("src",sourceLink+'?imageView2/1/w/68/h/68');
                     $("#"+file.id+"loading").remove();

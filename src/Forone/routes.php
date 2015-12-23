@@ -9,6 +9,7 @@
 Route::get('/', function () {
     return redirect('/admin/auth/login');
 });
+
 Route::controllers([
     'admin/auth' => config('forone.auth.administrator_auth_controller', '\Forone\Admin\Controllers\Auth\AuthController'),
 ]);
@@ -26,6 +27,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin.auth', 'admin.permiss
     });
 
 });
+
+//account
+Route::group(['namespace' => '\Forone\Admin\Controllers\Account'], function () {
+    Route::resource('account', 'AccountController');
+});
+
 
 //upload
 Route::get('/admin/qiniu/upload-token', ['as'=>'admin.qiniu.upload-token', 'uses'=>'Forone\Admin\Controllers\Upload\QiniuController@token']);

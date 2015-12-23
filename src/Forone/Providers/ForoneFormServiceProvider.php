@@ -32,6 +32,7 @@ class ForoneFormServiceProvider extends ServiceProvider
         $this->formMultiSelect();
         $this->formDate();
         $this->formTime();
+        $this->formDelete();
         $this->ueditor();
     }
 
@@ -360,6 +361,20 @@ class ForoneFormServiceProvider extends ServiceProvider
                 '<input id="' . $name . 'date" name="' . $name . '" type="text" value="' . $value . '" class="form-control" placeholder="' . $placeholder . '">';
             $js = "<script>init.push(function(){jQuery('#" . $name . "date').datetimepicker({format:'Y-m-d H:i'});})</script>";
             return $result . '</div></div>' . $js;
+        });
+    }
+
+    private function formDelete()
+    {
+        Form::macro('form_delete', function ($name,$url) {
+            $result = '<a class="btn inline">
+                            <form action="'.$url.'" method="POST">
+                                <input name="_token" type="hidden" value="'.csrf_token().'">
+                                <input name="_method" type="hidden" value="DELETE">
+                                <button class="btn">'.$name.'</button>
+                            </form>
+                       </a>';
+            return $result;
         });
     }
 }

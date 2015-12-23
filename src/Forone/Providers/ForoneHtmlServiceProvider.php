@@ -121,6 +121,7 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                 $size = sizeof($button);
                                 if ($size == 1) {
                                     $value = $button[0];
+                                    //var_dump($button);
                                     if ($value == '禁用') {
                                         $html .= Form::form_button([
                                             'name'  => $value,
@@ -139,6 +140,8 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                     } else if ($value == '编辑') {
                                         $html .= '<a href="' . $this->url->current() . '/' . $item['id'] . '/edit">
                                                     <button class="btn">编辑</button></a>';
+                                    } else if ($value == '删除'){
+                                        $html .= Form::form_delete($value,$this->url->current() . '/' . $item['id']);
                                     }
                                 } else {
                                     $getButton = sizeof($button) > 2 ? true : false;
@@ -167,8 +170,13 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                 }
                             }
                         }elseif($field == 'label'){
-                             $labelVal=$functions[$field]($item);
-;                            $html.=Form::label($field,$labelVal);
+                            $labelVal=$functions[$field]($item);
+                            $html.=Form::label($field,$labelVal);
+                        }elseif($field == 'imageShow'){
+                            $labelVal=$functions[$field]($item);
+                            $picName=isset($labelVal['name'])?$labelVal['name']:'';
+                            $url=$labelVal['src'];
+                            $html.=Form::image($url,$picName,$labelVal);
                         }else {
                             if (array_key_exists($field, $functions)) {
                                 $value = $functions[$field]($item[$field]);
@@ -194,7 +202,7 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             $html .= '<tfoot>';
             $html .= ' <tr>';
             $html .= '    <td colspan="10" class="text-center">';
-            //$html .= in_array('render',get_class_methods($items)) ? $items->render() : '';
+            $html .= !is_array($items) && in_array('render',get_class_methods($items))  ? $items->render() : '';
             $html .= '  </td>';
             $html .= ' </tr>';
             $html .= '</tfoot>';

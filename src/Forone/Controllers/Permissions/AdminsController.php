@@ -32,7 +32,8 @@ class AdminsController extends BaseController {
                 ['创建时间', 'created_at'],
                 ['操作', 'buttons', function ($data) {
                     $buttons = [
-                        ['编辑']
+                        ['编辑'],
+                        ['删除'],
                     ];
                     if (!$data->hasRole(config('defender.superuser_role', 'superuser'))) {
                         array_push($buttons, ['分配角色', '#modal']);
@@ -137,6 +138,19 @@ class AdminsController extends BaseController {
             }
         }
         return $this->toIndex('角色分配成功');
+    }
+
+    /**
+     * Delete the specified resource in storage
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id){
+        if(User::destroy($id)){
+            return $this->toIndex('删除成功');
+        }else{
+            return $this->toIndex('删除失败');
+        }
     }
 
 }

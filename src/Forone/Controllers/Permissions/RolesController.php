@@ -43,6 +43,7 @@ class RolesController extends BaseController {
                     if ($data->name != config('defender.superuser_role', 'superuser')) {
                         $buttons = [
                             ['编辑'],
+                            ['删除'],
                         ];
                         array_push($buttons, ['分配权限', '#modal']);
                     }
@@ -129,5 +130,18 @@ class RolesController extends BaseController {
             }
         }
         return $this->toIndex('权限分配成功');
+    }
+
+    /**
+     * Delete the specified resource in storage
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id){
+        if(Role::destroy($id)){
+            return $this->toIndex('删除成功');
+        }else{
+            return $this->toIndex('删除失败');
+        }
     }
 }

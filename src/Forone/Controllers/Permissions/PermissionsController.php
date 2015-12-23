@@ -34,6 +34,7 @@ class PermissionsController extends BaseController {
                 ['操作', 'buttons', function ($data) {
                     $buttons = [
                         ['编辑'],
+                        ['删除'],
                     ];
                     return $buttons;
                 }]
@@ -95,5 +96,21 @@ class PermissionsController extends BaseController {
 
         return $this->toIndex('编辑成功');
     }
+
+
+    /**
+     * Delete the specified resource in storage
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id){
+        $delRel=Permission::where('id',$id)->delete();
+        if($delRel){
+            return $this->toIndex('删除成功');
+        }else{
+            return $this->toIndex('删除失败');
+        }
+    }
+
 
 }
