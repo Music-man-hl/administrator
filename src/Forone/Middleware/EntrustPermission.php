@@ -22,6 +22,9 @@ class EntrustPermission {
      */
     public function handle($request, Closure $next, $permissions = null)
     {
+        if(!\Auth::check()){
+            return redirect('/');
+        }
         if ($permissions != null && !\Auth::user()->can(explode('|', $permissions))) {
             return response('Forbidden', 403);
         }

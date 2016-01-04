@@ -34,6 +34,7 @@ class ForoneFormServiceProvider extends ServiceProvider
         $this->formTime();
         $this->formDelete();
         $this->ueditor();
+        $this->makePager();
     }
 
     public static function parseValue($model, $name)
@@ -104,6 +105,62 @@ class ForoneFormServiceProvider extends ServiceProvider
     {
         Form::macro('hidden_input', function ($name, $value = '') {
             return '<input type="hidden" value="' . $value . '" name="' . $name . '" id="' . $name . '">';
+        });
+    }
+
+    private function makePager(){
+        /*
+         * $page
+         * "total" => 14
+         * "lastPage" => 2
+         * "currentPage" => 1
+         * "perPage" => 10
+         * "path" => "http://center.aishan.com/mainProduct"
+         *
+         * */
+        Form::macro('make_pager', function ($page) {
+            //拼接queryString
+            $input=\Input::all();
+            $queryString='?';
+            if(is_array($input)){
+                foreach($input as $key => $value){
+                    if($key!='page'){
+                        $queryString.=$key.'='.$value.'&';
+                    }
+
+                }
+            }
+            $queryString=$queryString.'page=';
+            //拼接分页
+            $html='<div>
+                    <span class="pull-left">共 '.$page['total'].' 条记录，'.$page['lastPage'].' 页，'.$page['perPage'].'条/页</span>
+                        <ul class="pagination">';
+            if($page['currentPage']<2){
+                $html.='<li class="disabled"><span>«</span></li>';
+            }else{
+                $html.='<li><a href="'.$page['path'].$queryString.($page['currentPage']-1).'" >«</a></li>';
+            }
+            $active=false;
+            for($i=1;$i<=12;$i++){
+                if($page['lastPage']>=$i){
+                    if($page['currentPage']==$i){
+                        $active=true;
+                        $html.='<li class="active"><span>'.$page['currentPage'].'</span></li>';
+                    }else{
+                        $html.='<li><a href="'.$page['path'].$queryString.$i.'">'.$i.'</a></li>';
+                    }
+                }
+            }
+            if(!$active){
+                $html.='<li  class="active"><span>'.$page['currentPage'].'</span></li>';
+            }
+            if($page['currentPage']<$page['lastPage']){
+                $html.='<li><a href="'.$page['path'].$queryString.($page['currentPage']+1).'" rel="next">»</a></li>';
+            }else{
+                $html.='<li class="disabled"><span>»</span></li>';
+            }
+            $html.='</ul></div>';
+            return $html;
         });
     }
 

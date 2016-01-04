@@ -47,6 +47,7 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             $html = '<table class="table m-b-none" data-sort="false" ui-jp="footable">';
             $columns = $data['columns'];
             $items = $data['items'];
+            $page = isset($data['page'])?$data['page']:'';
             $heads = [];
             $widths = [];
             $fields = [];
@@ -108,11 +109,9 @@ class ForoneHtmlServiceProvider extends ServiceProvider
 
             $html .= '<tbody>';
             if ($items) {
-
                 foreach ($items as $item) {
                     $html .= '<tr>';
                     foreach ($fields as $field) {
-
                         $index = array_search($field, $fields);
                         $html .= $widths[$index] ? '<td style="width: ' . $widths[$index] . 'px">' : '<td>';
                         if ($field == 'buttons') {
@@ -187,8 +186,10 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                 } else {
                                     if(is_object($item))
                                         $value = $item->$field;
-                                    else
-                                    $value = $item[$field];
+                                    else{
+                                        $value = $item[$field];
+                                    }
+
                                 }
                             }
                             $html .= $value . '</td>';
@@ -202,7 +203,11 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             $html .= '<tfoot>';
             $html .= ' <tr>';
             $html .= '    <td colspan="10" class="text-center">';
-            $html .= !is_array($items) && in_array('render',get_class_methods($items))  ? $items->render() : '';
+            if(!is_array($items) && in_array('render',get_class_methods($items))){
+                $html .=$items->render();
+            }else if(!empty($page)){
+                $html .= Form::make_pager($page);//
+            }
             $html .= '  </td>';
             $html .= ' </tr>';
             $html .= '</tfoot>';
@@ -217,6 +222,8 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             return $html;
         });
     }
+
+
 
     private function groupLabel()
     {
@@ -301,7 +308,7 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             $html = '<div class="panel panel-default">';
             $title = isset($data['title']) ? $data['title'] : '';
             $html .= '<div class="panel-heading">' . $title . '</div>';
-            $html .= '<div class="panel-body b-b b-light">';
+            $html .= '<div class="panel-body b-b b-light"><form action="'.\Request::getPathInfo().'" method="GET">';
             if (array_key_exists('new', $data)) {
                 $html .= '<a href="' . $this->url->current() . '/create" class="btn btn-primary">&#43; 新增</a>';
             }
@@ -348,7 +355,6 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             }
 
             if (array_key_exists('priceStart',$data)) {
-
                 $priceStart = is_bool($data['priceStart']) ? '价格' : $data['priceStart'];
                 $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
                                 <input id="priceStartInput" type="text" class="form-control input" name="priceStart" value="'.Input::get('priceStart').'" placeholder="'.$priceStart.'"  />
@@ -429,6 +435,93 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                 $html .= $js;
             }
 
+            if (array_key_exists('timeStart',$data)) {
+                $timeStart = $data['timeStart'];
+                $placeholder = is_bool($timeStart['placeholder']) ? '开始时间' : $timeStart['placeholder'];
+                $timeFormat = isset($timeStart['timeFormat']) ? $timeStart['timeFormat']:'Y-m-d H:i:s';
+                $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+                                <input id="timeStartInput" type="text" class="form-control input" name="timeStart" value="'.Input::get('timeStart').'" placeholder="'.$placeholder.'"  />
+                            </div>';
+                $js = "<script>init.push(function(){
+                    jQuery('#timeStartInput').datetimepicker({format:'".$timeFormat."'});
+                    $('#timeStartInput').keyup(function(event){
+                        if(event.keyCode == 13){
+                            console.log('do search');
+                            var params = window.location.search.substring(1);
+                            var paramObject = {};
+                            var paramArray = params.split('&');
+                            paramArray.forEach(function(param){
+                                if(param){
+                                    var arr = param.split('=');
+                                    paramObject[arr[0]] = arr[1];
+                                }
+                            });
+                            var baseUrl = window.location.origin+window.location.pathname;
+                            if($(this).val()){
+                                 if($('#timeEndInput').val())
+                                    {
+                                        if($('#timeEndInput').val() >= $(this).val()){
+                                             paramObject[$('#timeEndInput').attr('name')] = $('#timeEndInput').val();
+                                        }else{
+                                            alert('范围有错');
+                                            return;
+                                        }
+                                    }
+                                 paramObject[$(this).attr('name')] = $(this).val();
+                            }else{
+                                delete paramObject[$(this).attr('name')];
+                            }
+                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
+                        }
+                    });
+                });</script>";
+                $html .= $js;
+            }
+
+            if (array_key_exists('timeEnd',$data)) {
+                $timeEnd = $data['timeEnd'];
+                $placeholder = is_bool($timeEnd['placeholder']) ? '结束时间' : $timeEnd['placeholder'];
+                $timeFormat = isset($timeEnd['timeFormat']) ? $timeEnd['timeFormat']:'Y-m-d H:i:s';
+                $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+                                <input id="timeEndInput" type="text" class="form-control input" name="timeEnd" value="'.Input::get('timeEnd').'" placeholder="'.$placeholder.'"  />
+                            </div>';
+                $js = "<script>init.push(function(){
+                    jQuery('#timeEndInput').datetimepicker({format:'".$timeFormat."'});
+                    $('#timeEndInput').keyup(function(event){
+                        if(event.keyCode == 13){
+                            console.log('do search');
+                            var params = window.location.search.substring(1);
+                            var paramObject = {};
+                            var paramArray = params.split('&');
+                            paramArray.forEach(function(param){
+                                if(param){
+                                    var arr = param.split('=');
+                                    paramObject[arr[0]] = arr[1];
+                                }
+                            });
+                            var baseUrl = window.location.origin+window.location.pathname;
+                            if($(this).val()){
+                                if($('#timeStartInput').val())
+                                {
+                                    if($('#timeStartInput').val() <= $(this).val()){
+                                         paramObject[$('#timeStartInput').attr('name')] = $('#timeStartInput').val();
+                                    }else{
+                                        alert('范围有错');
+                                        return;
+                                    }
+                                }
+                                paramObject[$(this).attr('name')] = $(this).val();
+                            }else{
+                                delete paramObject[$(this).attr('name')];
+                            }
+                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
+                        }
+                    });
+                });</script>";
+                $html .= $js;
+            }
+
+
             if (array_key_exists('search', $data)) {
                 $search = is_bool($data['search']) ? '请输入您想检索的信息' : $data['search'];
                 $html .= '<div class="col-md-3" style="padding-left:0px; float: right;width: 17%">
@@ -460,7 +553,14 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                 $html .= $js;
             }
 
-            $html .= '</div>';
+            if (array_key_exists('submit', $data)) {
+                $search = is_bool($data['submit']) ? '搜索' : $data['submit'];
+                $html .= '<div class="col-md-3" style="padding-left:0px;width: 17%">
+                                <button type="submit" class="btn btn-primary"> '.$search.'</button>
+                            </div>';
+            }
+
+            $html .= '</form></div>';
             return $html;
         };
         Html::macro('list_header', $handler);
