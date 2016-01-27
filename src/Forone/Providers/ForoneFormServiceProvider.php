@@ -344,10 +344,11 @@ class ForoneFormServiceProvider extends ServiceProvider
 
     private function formSelect()
     {
-        Form::macro('form_select', function ($name, $label, $data, $percent = 0.5, $modal=false) {
+        Form::macro('form_select', function ($name, $label, $data, $percent = 0.5, $modal=false,$disabled=false) {
+            $disabled =$disabled ? "disabled":"";
             $result = '<div class="form-group col-sm-' . ($percent * 12) . '">
                         ' . Form::form_label($label, $modal) . '
-                        <div class="col-sm-9"><select class="form-control" name="' . $name . '">';
+                        <div class="col-sm-9"><select class="form-control" name="' . $name . '" '.$disabled.'>';
             foreach ($data as $item) {
                 $value = is_array($item) ? $item['value'] : $item;
                 $label = is_array($item) ? $item['label'] : $item;

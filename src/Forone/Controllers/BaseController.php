@@ -21,18 +21,26 @@ class BaseController extends Controller
     protected $pageTitle;
     protected $rules = [];
     protected $uri = '';
-
-    function __construct($uri='', $name='')
+    protected $uriSecond = '';
+    protected $module ='';
+    function __construct($uri='', $name='',$module='')
     {
         $this->currentUser = Auth::user();
-        $this->uri = $uri;
+        $this->uriSecond =$uri;
+        if(empty($module)){
+            $this->uri = $uri;
+        }else{
+            $this->uri = $module.'.'.$uri;
+        }
+
         View::share('currentUser', $this->currentUser);
 
         //share the config option to all the views
         View::share('siteConfig', config('forone.site_config'));
         View::share('pageTitle', $this->loadPageTitle());
         view()->share('page_name', $name);
-        view()->share('uri', $uri);
+        view()->share('uri', $this->uri);
+        view()->share('uriSecond', $uri);
     }
 
     private function loadPageTitle()

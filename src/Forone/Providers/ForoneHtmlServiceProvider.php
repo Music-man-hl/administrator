@@ -120,7 +120,6 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                 $size = sizeof($button);
                                 if ($size == 1) {
                                     $value = $button[0];
-                                    //var_dump($button);
                                     if ($value == '禁用') {
                                         $html .= Form::form_button([
                                             'name'  => $value,
@@ -136,9 +135,12 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                     } else if ($value == '查看') {
                                         $html .= '<a href="' . $this->url->current() . '/' . $item['id'] . '">
                                                     <button class="btn">查看</button></a>';
-                                    } else if ($value == '编辑') {
+                                    } else if ($value == '编辑' || $value == '查看详情') {
                                         $html .= '<a href="' . $this->url->current() . '/' . $item['id'] . '/edit">
-                                                    <button class="btn">编辑</button></a>';
+                                                    <button class="btn">'.$value.'</button></a>';
+                                    }  else if ($value == '查看/编辑') {
+                                        $html .= '<a href="' . $this->url->current() . '/' . $item['id'] . '/edit">
+                                                    <button class="btn">查看/编辑</button></a>';
                                     } else if ($value == '删除'){
                                         $html .= Form::form_delete($value,$this->url->current() . '/' . $item['id']);
                                     }
@@ -147,7 +149,9 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                     $config = $getButton ? $button : $button[0];
                                     $data = $getButton ? [] : $button[1];
                                     if (is_string($data) && strripos($data, '#') == 0) {
-                                        $html .= Form::modal_button($config, $data, $item);
+                                        if(!empty($item['id'])){
+                                            $html .= Form::modal_button($config, $data, $item);
+                                        }
                                     } else {
                                         if (array_key_exists('method', $config) && $config['method'] == 'GET') {
                                             $uri = array_key_exists('uri', $config) ? $config['uri'] : '';
@@ -256,9 +260,34 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             if (!$submit_label) {
                 return '';
             }
-            $result = '</div><footer class="panel-footer">
-                            <button type="submit" class="btn btn-info">' . $submit_label . '</button>
-                        </footer></div>';
+            $result = '</div><footer class="panel-footer">';
+            if(is_array($submit_label)){
+                $keys = array_keys($submit_label);
+
+                foreach($keys as $key){
+                    switch($key){
+                        case 'submit':
+                            $text = '提交';
+                            if(!is_bool($submit_label['submit'])){
+                                $text = $submit_label['submit'];
+                            }
+                            $result .= '<button type="submit" class="btn btn-info" style="margin-left:2%">' . $text . '</button>';
+                            break;
+                        case 'callback':
+                            $url = !is_bool($submit_label['callback']) ? $submit_label['callback'] : \URL::previous();
+                            $result .= '<a href="'.$url.'" class="btn btn-warning" style="margin-left:2%">返回</a>';
+                            break;
+                        case 'button':
+                            $text = $submit_label['button']['text'];
+                            $url = $submit_label['button']['url'];
+                            $result .= '<a href="'.$url.'" class="btn btn-primary" style="margin-left:2%">'.$text.'</a>';
+                            break;
+                    }
+                }
+            }else{
+                $result .= '<button type="submit" class="btn btn-info" style="margin-left:2%">' . $submit_label . '</button>';
+            }
+            $result .='</footer></div>';
             return $result;
         });
     }
@@ -309,257 +338,279 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             $title = isset($data['title']) ? $data['title'] : '';
             $html .= '<div class="panel-heading">' . $title . '</div>';
             $html .= '<div class="panel-body b-b b-light"><form action="'.\Request::getPathInfo().'" method="GET">';
-            if (array_key_exists('new', $data)) {
-                $html .= '<a href="' . $this->url->current() . '/create" class="btn btn-primary">&#43; 新增</a>';
-            }
-            if (array_key_exists('filters', $data)) {
 
-                $result = '';
-                foreach ($data['filters'] as $key => $value) {
-                    $result .= '<div class="col-sm-2" style="padding-left: 0px;width: 8%">
-                        <select class="form-control" name="' . $key . '">';
-                    foreach ($value as $item) {
-                        $value = is_array($item) ? $item['value'] : $item;
-                        $label = is_array($item) ? $item['label'] : $item;
-                        $selected = '';
-                        $urlValue = Input::get($key);
-                        if ($urlValue != null) {
-                            $selected = $urlValue == $item['value'] ? 'selected="selected"' : '';
-                        }
-                        $result .= '<option ' . $selected . ' value="' . $value . '">' . $label . '</option>';
-                    }
-                    $result .= '</select></div>';
-                }
-
-                $js = "<script>init.push(function(){
-                        $('select').change(function(){
-                            var params = window.location.search.substring(1);
-                            var paramObject = {};
-                            var paramArray = params.split('&');
-                            paramArray.forEach(function(param){
-                                if(param){
-                                    var arr = param.split('=');
-                                    paramObject[arr[0]] = arr[1];
-                                }
-                            });
-                            var baseUrl = window.location.origin+window.location.pathname;
-                            if($(this).val()){
-                                paramObject[$(this).attr('name')] = $(this).val();
-                            }else{
-                                delete paramObject[$(this).attr('name')];
-                            }
-                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
-                        });
-                    })</script>";
-                $html .= $result . $js;
-            }
-
-            if (array_key_exists('priceStart',$data)) {
-                $priceStart = is_bool($data['priceStart']) ? '价格' : $data['priceStart'];
-                $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+            $dataKeys = array_keys($data);
+            foreach($dataKeys as $key){
+                switch($key){
+                    case 'new' :
+                        $html .= '<a href="' . $this->url->current() . '/create" class="btn btn-primary">&#43; 新增</a>';
+                        break;
+                    case 'priceStart' :
+                        $priceStart = is_bool($data['priceStart']) ? '价格' : $data['priceStart'];
+                        $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
                                 <input id="priceStartInput" type="text" class="form-control input" name="priceStart" value="'.Input::get('priceStart').'" placeholder="'.$priceStart.'"  />
                             </div>';
-                $js = "<script>init.push(function(){
-                    $('#priceStartInput').keyup(function(event){
-                        if(event.keyCode == 13){
-                            console.log('do search');
-                            var params = window.location.search.substring(1);
-                            var paramObject = {};
-                            var paramArray = params.split('&');
-                            paramArray.forEach(function(param){
-                                if(param){
-                                    var arr = param.split('=');
-                                    paramObject[arr[0]] = arr[1];
+                        $js = "<script>init.push(function(){
+                            $('#priceStartInput').keyup(function(event){
+                                if(event.keyCode == 13){
+                                    console.log('do search');
+                                    var params = window.location.search.substring(1);
+                                    var paramObject = {};
+                                    var paramArray = params.split('&');
+                                    paramArray.forEach(function(param){
+                                        if(param){
+                                            var arr = param.split('=');
+                                            paramObject[arr[0]] = arr[1];
+                                        }
+                                    });
+                                    var baseUrl = window.location.origin+window.location.pathname;
+                                    if($(this).val()){
+                                         if($('#priceEndInput').val())
+                                            {
+                                                if(parseFloat($('#priceEndInput').val()) >= parseFloat($(this).val())){
+                                                     paramObject[$('#priceEndInput').attr('name')] = $('#priceEndInput').val();
+                                                }else{
+                                                    alert('范围有错');
+                                                    return;
+                                                }
+                                            }
+                                         paramObject[$(this).attr('name')] = $(this).val();
+                                    }else{
+                                        delete paramObject[$(this).attr('name')];
+                                    }
+                                    window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
                                 }
                             });
-                            var baseUrl = window.location.origin+window.location.pathname;
-                            if($(this).val()){
-                                 if($('#priceEndInput').val())
-                                    {
-                                        if(parseFloat($('#priceEndInput').val()) >= parseFloat($(this).val())){
-                                             paramObject[$('#priceEndInput').attr('name')] = $('#priceEndInput').val();
-                                        }else{
-                                            alert('范围有错');
-                                            return;
-                                        }
-                                    }
-                                 paramObject[$(this).attr('name')] = $(this).val();
-                            }else{
-                                delete paramObject[$(this).attr('name')];
-                            }
-                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
-                        }
-                    });
-                });</script>";
-                $html .= $js;
-            }
-
-            if (array_key_exists('priceEnd',$data)) {
-
-                $priceEnd = is_bool($data['priceEnd']) ? '价格' : $data['priceEnd'];
-                $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+                        });</script>";
+                        $html .= $js;
+                        break;
+                    case 'priceEnd' :
+                        $priceEnd = is_bool($data['priceEnd']) ? '价格' : $data['priceEnd'];
+                        $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
                                 <input id="priceEndInput" type="text" class="form-control input" name="priceEnd" value="'.Input::get('priceEnd').'" placeholder="'.$priceEnd.'"  />
                             </div>';
-                $js = "<script>init.push(function(){
-                    $('#priceEndInput').keyup(function(event){
-                        if(event.keyCode == 13){
-                            console.log('do search');
-                            var params = window.location.search.substring(1);
-                            var paramObject = {};
-                            var paramArray = params.split('&');
-                            paramArray.forEach(function(param){
-                                if(param){
-                                    var arr = param.split('=');
-                                    paramObject[arr[0]] = arr[1];
+                        $js = "<script>init.push(function(){
+                            $('#priceEndInput').keyup(function(event){
+                                if(event.keyCode == 13){
+                                    console.log('do search');
+                                    var params = window.location.search.substring(1);
+                                    var paramObject = {};
+                                    var paramArray = params.split('&');
+                                    paramArray.forEach(function(param){
+                                        if(param){
+                                            var arr = param.split('=');
+                                            paramObject[arr[0]] = arr[1];
+                                        }
+                                    });
+                                    var baseUrl = window.location.origin+window.location.pathname;
+                                    if($(this).val()){
+                                        if($('#priceStartInput').val())
+                                        {
+                                            if(parseFloat($('#priceStartInput').val()) <= parseFloat($(this).val())){
+                                                 paramObject[$('#priceStartInput').attr('name')] = $('#priceStartInput').val();
+                                            }else{
+                                                alert('范围有错');
+                                                return;
+                                            }
+                                        }
+                                        paramObject[$(this).attr('name')] = $(this).val();
+                                    }else{
+                                        delete paramObject[$(this).attr('name')];
+                                    }
+                                    window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
                                 }
                             });
-                            var baseUrl = window.location.origin+window.location.pathname;
-                            if($(this).val()){
-                                if($('#priceStartInput').val())
-                                {
-                                    if(parseFloat($('#priceStartInput').val()) <= parseFloat($(this).val())){
-                                         paramObject[$('#priceStartInput').attr('name')] = $('#priceStartInput').val();
-                                    }else{
-                                        alert('范围有错');
-                                        return;
-                                    }
-                                }
-                                paramObject[$(this).attr('name')] = $(this).val();
-                            }else{
-                                delete paramObject[$(this).attr('name')];
-                            }
-                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
-                        }
-                    });
-                });</script>";
-                $html .= $js;
-            }
-
-            if (array_key_exists('timeStart',$data)) {
-                $timeStart = $data['timeStart'];
-                $placeholder = is_bool($timeStart['placeholder']) ? '开始时间' : $timeStart['placeholder'];
-                $timeFormat = isset($timeStart['timeFormat']) ? $timeStart['timeFormat']:'Y-m-d H:i:s';
-                $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+                        });</script>";
+                        $html .= $js;
+                        break;
+                    case 'timeStart' :
+                        $timeStart = $data['timeStart'];
+                        $placeholder = is_bool($timeStart['placeholder']) ? '开始时间' : $timeStart['placeholder'];
+                        $timeFormat = isset($timeStart['timeFormat']) ? $timeStart['timeFormat']:'Y-m-d H:i:s';
+                        $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
                                 <input id="timeStartInput" type="text" class="form-control input" name="timeStart" value="'.Input::get('timeStart').'" placeholder="'.$placeholder.'"  />
                             </div>';
-                $js = "<script>init.push(function(){
+                        $js = "<script>init.push(function(){
                     jQuery('#timeStartInput').datetimepicker({format:'".$timeFormat."'});
-                    $('#timeStartInput').keyup(function(event){
-                        if(event.keyCode == 13){
-                            console.log('do search');
-                            var params = window.location.search.substring(1);
-                            var paramObject = {};
-                            var paramArray = params.split('&');
-                            paramArray.forEach(function(param){
-                                if(param){
-                                    var arr = param.split('=');
-                                    paramObject[arr[0]] = arr[1];
+                        $('#timeStartInput').keyup(function(event){
+                            if(event.keyCode == 13){
+                                console.log('do search');
+                                var params = window.location.search.substring(1);
+                                var paramObject = {};
+                                var paramArray = params.split('&');
+                                paramArray.forEach(function(param){
+                                    if(param){
+                                        var arr = param.split('=');
+                                        paramObject[arr[0]] = arr[1];
+                                    }
+                                });
+                                var baseUrl = window.location.origin+window.location.pathname;
+                                if($(this).val()){
+                                     if($('#timeEndInput').val())
+                                        {
+                                            if($('#timeEndInput').val() >= $(this).val()){
+                                                 paramObject[$('#timeEndInput').attr('name')] = $('#timeEndInput').val();
+                                            }else{
+                                                alert('范围有错');
+                                                return;
+                                            }
+                                        }
+                                     paramObject[$(this).attr('name')] = $(this).val();
+                                }else{
+                                    delete paramObject[$(this).attr('name')];
                                 }
-                            });
-                            var baseUrl = window.location.origin+window.location.pathname;
-                            if($(this).val()){
-                                 if($('#timeEndInput').val())
+                                window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
+                            }
+                        });
+                    });</script>";
+                        $html .= $js;
+                        break;
+                    case 'timeEnd' :
+                        $timeEnd = $data['timeEnd'];
+                        $placeholder = is_bool($timeEnd['placeholder']) ? '结束时间' : $timeEnd['placeholder'];
+                        $timeFormat = isset($timeEnd['timeFormat']) ? $timeEnd['timeFormat']:'Y-m-d H:i:s';
+                        $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+                                <input id="timeEndInput" type="text" class="form-control input" name="timeEnd" value="'.Input::get('timeEnd').'" placeholder="'.$placeholder.'"  />
+                            </div>';
+                        $js = "<script>init.push(function(){
+                    jQuery('#timeEndInput').datetimepicker({format:'".$timeFormat."'});
+                        $('#timeEndInput').keyup(function(event){
+                            if(event.keyCode == 13){
+                                console.log('do search');
+                                var params = window.location.search.substring(1);
+                                var paramObject = {};
+                                var paramArray = params.split('&');
+                                paramArray.forEach(function(param){
+                                    if(param){
+                                        var arr = param.split('=');
+                                        paramObject[arr[0]] = arr[1];
+                                    }
+                                });
+                                var baseUrl = window.location.origin+window.location.pathname;
+                                if($(this).val()){
+                                    if($('#timeStartInput').val())
                                     {
-                                        if($('#timeEndInput').val() >= $(this).val()){
-                                             paramObject[$('#timeEndInput').attr('name')] = $('#timeEndInput').val();
+                                        if($('#timeStartInput').val() <= $(this).val()){
+                                             paramObject[$('#timeStartInput').attr('name')] = $('#timeStartInput').val();
                                         }else{
                                             alert('范围有错');
                                             return;
                                         }
                                     }
-                                 paramObject[$(this).attr('name')] = $(this).val();
-                            }else{
-                                delete paramObject[$(this).attr('name')];
-                            }
-                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
-                        }
-                    });
-                });</script>";
-                $html .= $js;
-            }
-
-            if (array_key_exists('timeEnd',$data)) {
-                $timeEnd = $data['timeEnd'];
-                $placeholder = is_bool($timeEnd['placeholder']) ? '结束时间' : $timeEnd['placeholder'];
-                $timeFormat = isset($timeEnd['timeFormat']) ? $timeEnd['timeFormat']:'Y-m-d H:i:s';
-                $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
-                                <input id="timeEndInput" type="text" class="form-control input" name="timeEnd" value="'.Input::get('timeEnd').'" placeholder="'.$placeholder.'"  />
-                            </div>';
-                $js = "<script>init.push(function(){
-                    jQuery('#timeEndInput').datetimepicker({format:'".$timeFormat."'});
-                    $('#timeEndInput').keyup(function(event){
-                        if(event.keyCode == 13){
-                            console.log('do search');
-                            var params = window.location.search.substring(1);
-                            var paramObject = {};
-                            var paramArray = params.split('&');
-                            paramArray.forEach(function(param){
-                                if(param){
-                                    var arr = param.split('=');
-                                    paramObject[arr[0]] = arr[1];
+                                    paramObject[$(this).attr('name')] = $(this).val();
+                                }else{
+                                    delete paramObject[$(this).attr('name')];
                                 }
-                            });
-                            var baseUrl = window.location.origin+window.location.pathname;
-                            if($(this).val()){
-                                if($('#timeStartInput').val())
-                                {
-                                    if($('#timeStartInput').val() <= $(this).val()){
-                                         paramObject[$('#timeStartInput').attr('name')] = $('#timeStartInput').val();
-                                    }else{
-                                        alert('范围有错');
-                                        return;
+                                window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
+                            }
+                        });
+                    });</script>";
+                        $html .= $js;
+                        break;
+                    case 'filters' :
+                        $result = '';
+                        foreach ($data['filters'] as $key => $value) {
+                            $result .= '<div class="col-sm-2" style="padding-left: 0px;width: 8%">
+                        <select class="form-control" name="' . $key . '">';
+                            foreach ($value as $item) {
+                                $value = is_array($item) ? $item['value'] : $item;
+                                $label = is_array($item) ? $item['label'] : $item;
+                                $selected = '';
+                                $urlValue = Input::get($key);
+                                if ($urlValue != null) {
+                                    $selected = $urlValue == $item['value'] ? 'selected="selected"' : '';
+                                }
+                                $result .= '<option ' . $selected . ' value="' . $value . '">' . $label . '</option>';
+                            }
+                            $result .= '</select></div>';
+                        }
+
+                        $js = "<script>init.push(function(){
+                            $('select').change(function(){
+                                var params = window.location.search.substring(1);
+                                var paramObject = {};
+                                var paramArray = params.split('&');
+                                paramArray.forEach(function(param){
+                                    if(param){
+                                        var arr = param.split('=');
+                                        paramObject[arr[0]] = arr[1];
                                     }
+                                });
+                                var baseUrl = window.location.origin+window.location.pathname;
+                                if($(this).val()){
+                                    paramObject[$(this).attr('name')] = $(this).val();
+                                }else{
+                                    delete paramObject[$(this).attr('name')];
                                 }
-                                paramObject[$(this).attr('name')] = $(this).val();
-                            }else{
-                                delete paramObject[$(this).attr('name')];
-                            }
-                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
-                        }
-                    });
-                });</script>";
-                $html .= $js;
-            }
-
-
-            if (array_key_exists('search', $data)) {
-                $search = is_bool($data['search']) ? '请输入您想检索的信息' : $data['search'];
-                $html .= '<div class="col-md-3" style="padding-left:0px; float: right;width: 17%">
+                                window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
+                            });
+                        })</script>";
+                        $html .= $result . $js;
+                        break;
+                    case 'search' :
+                        $search = is_bool($data['search']) ? '请输入您想检索的信息' : $data['search'];
+                        $html .= '<div class="col-md-3" style="padding-left:0px; float: right;width: 17%">
                                 <input id="keywordsInput" type="text" class="form-control input" name="keywords" value="' . Input::get('keywords') . '" placeholder="' . $search . '"  />
                             </div>';
-                $js = "<script>init.push(function(){
-                    $('#keywordsInput').keyup(function(event){
-                        if(event.keyCode == 13){
-                            console.log('do search');
-                            var params = window.location.search.substring(1);
-                            var paramObject = {};
-                            var paramArray = params.split('&');
-                            paramArray.forEach(function(param){
-                                if(param){
-                                    var arr = param.split('=');
-                                    paramObject[arr[0]] = arr[1];
+                        $js = "<script>init.push(function(){
+                            $('#keywordsInput').keyup(function(event){
+                                if(event.keyCode == 13){
+                                    console.log('do search');
+                                    var params = window.location.search.substring(1);
+                                    var paramObject = {};
+                                    var paramArray = params.split('&');
+                                    paramArray.forEach(function(param){
+                                        if(param){
+                                            var arr = param.split('=');
+                                            paramObject[arr[0]] = arr[1];
+                                        }
+                                    });
+                                    var baseUrl = window.location.origin+window.location.pathname;
+                                    if($(this).val()){
+                                        paramObject[$(this).attr('name')] = $(this).val();
+                                    }else{
+                                        delete paramObject[$(this).attr('name')];
+                                    }
+                                    window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
                                 }
                             });
-                            var baseUrl = window.location.origin+window.location.pathname;
-                            if($(this).val()){
-                                paramObject[$(this).attr('name')] = $(this).val();
-                            }else{
-                                delete paramObject[$(this).attr('name')];
-                            }
-                            window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
-                        }
-                    });
-                });</script>";
-                $html .= $js;
-            }
-
-            if (array_key_exists('submit', $data)) {
-                $search = is_bool($data['submit']) ? '搜索' : $data['submit'];
-                $html .= '<div class="col-md-3" style="padding-left:0px;width: 17%">
+                        });</script>";
+                        $html .= $js;
+                        break;
+                    case 'submit' :
+                        $search = is_bool($data['submit']) ? '搜索' : $data['submit'];
+                        $html .= '<div class="col-md-1" style="width: 4%">
                                 <button type="submit" class="btn btn-primary"> '.$search.'</button>
                             </div>';
+                        break;
+                    case 'callback' :
+                        $search = is_bool($data['callback']) ? '返回' : $data['callback'];
+                        if(is_array($search)){
+                            $text = $search['text'];
+                        }else{
+                            $text = $search;
+                        }
+                        $url = isset($search['url']) ? $search['url'] : \URL::previous();
+                        $html .= '<div class="col-md-1" style="width: 5%">
+                                <a class="btn btn-primary" href="'.$url.'"> '.$text.'</a>
+                            </div>';
+                        break;
+                    case 'button':
+                        $button = $data['button'];
+                        $url = $button['url'];
+                        $text = $button['text'];
+                        $html .= '<div class="col-md-1" style="width: 6%">
+                                    <a class="btn btn-default" href="'.$url.'">'.$text.'</a>
+                                </div>';
+                        break;
+                    case 'label':
+                        $text = $data['label'];
+                        $html .= '<div class="col-md-6 pull-right">
+                                    <label class="label label-info" >'.$text.'</label>
+                                </div>';
+                        break;
+                }
             }
-
             $html .= '</form></div>';
             return $html;
         };
