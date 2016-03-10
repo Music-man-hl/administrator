@@ -182,7 +182,11 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                             $html.=Form::image($url,$picName,$labelVal);
                         }else {
                             if (array_key_exists($field, $functions)) {
-                                $value = $functions[$field]($item[$field]);
+                                if(!is_object($item)){
+                                    $value = $functions[$field]($item[$field]);
+                                }else{
+                                    $value = $functions[$field]($item->$field);
+                                }
                             } else {
                                 $arr = explode('.', $field);
                                 if (sizeof($arr) == 2) {
