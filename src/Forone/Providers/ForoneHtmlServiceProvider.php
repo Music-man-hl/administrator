@@ -9,6 +9,7 @@
 namespace Forone\Admin\Providers;
 
 use Form;
+use Forone\Admin\Services\PagerPresenter;
 use Html;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\ServiceProvider;
@@ -212,9 +213,9 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             $html .= ' <tr>';
             $html .= '    <td colspan="10" class="text-center">';
             if(!is_array($items) && in_array('render',get_class_methods($items))){
-                $html .=$items->render();
+                $html .=$items->appends(Input::all())->render(new PagerPresenter($items));
             }else if(!empty($page)){
-                $html .= Form::make_pager($page);//
+                $html .= Form::make_pager($page);
             }
             $html .= '  </td>';
             $html .= ' </tr>';
@@ -431,7 +432,7 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                         $timeStart = $data['timeStart'];
                         $placeholder = is_bool($timeStart['placeholder']) ? '开始时间' : $timeStart['placeholder'];
                         $timeFormat = isset($timeStart['timeFormat']) ? $timeStart['timeFormat']:'Y-m-d H:i:s';
-                        $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+                        $html .= '<div class="col-md-2 col-sm-2" style="padding-left:0px;">
                                 <input id="timeStartInput" type="text" class="form-control input" name="timeStart" value="'.Input::get('timeStart').'" placeholder="'.$placeholder.'"  />
                             </div>';
                         $js = "<script>init.push(function(){
@@ -473,11 +474,11 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                         $timeEnd = $data['timeEnd'];
                         $placeholder = is_bool($timeEnd['placeholder']) ? '结束时间' : $timeEnd['placeholder'];
                         $timeFormat = isset($timeEnd['timeFormat']) ? $timeEnd['timeFormat']:'Y-m-d H:i:s';
-                        $html .= '<div class="col-md-3" style="padding-left:0px;width: 8%">
+                        $html .= '<div class="col-md-2 col-sm-2" style="padding-left:0px;">
                                 <input id="timeEndInput" type="text" class="form-control input" name="timeEnd" value="'.Input::get('timeEnd').'" placeholder="'.$placeholder.'"  />
                             </div>';
                         $js = "<script>init.push(function(){
-                    jQuery('#timeEndInput').datetimepicker({format:'".$timeFormat."'});
+                        jQuery('#timeEndInput').datetimepicker({format:'".$timeFormat."'});
                         $('#timeEndInput').keyup(function(event){
                             if(event.keyCode == 13){
                                 console.log('do search');
@@ -512,24 +513,24 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                         $html .= $js;
                         break;
                     case 'filters' :
-                        $result = '';
                         foreach ($data['filters'] as $key => $value) {
-                            $result .= '<div class="col-sm-2" style="padding-left: 0px;width: 8%">
-                        <select class="form-control" name="' . $key . '">';
-                            foreach ($value as $item) {
-                                $value = is_array($item) ? $item['value'] : $item;
-                                $label = is_array($item) ? $item['label'] : $item;
-                                $selected = '';
-                                $urlValue = Input::get($key);
-                                if ($urlValue != null) {
-                                    $selected = $urlValue == $item['value'] ? 'selected="selected"' : '';
-                                }
-                                $result .= '<option ' . $selected . ' value="' . $value . '">' . $label . '</option>';
-                            }
-                            $result .= '</select></div>';
-                        }
+                            $html .= '<div class="col-md-6 col-sm-6 form-group" style="margin-bottom: 0px;padding-left: 0">
+                                        <label class="col-md-3 col-sm-3 text-right" style="line-height: 35px;">'.$value['text'].'</label>
+                                        <select class="form-control"  style="width: 75%;margin-right: 0;display:inline-block;" name="' . $key . '">';
+                                            foreach ($value['select'] as $item) {
+                                                $value = is_array($item) ? $item['value'] : $item;
+                                                $label = is_array($item) ? $item['label'] : $item;
+                                                $selected = '';
+                                                $urlValue = Input::get($key);
+                                                if ($urlValue != null) {
+                                                    $selected = $urlValue == $item['value'] ? 'selected="selected"' : '';
+                                                }
+                                                $html .= '<option ' . $selected . ' value="' . $value . '">' . $label . '</option>';
+                                            }
 
-                        $js = "<script>init.push(function(){
+                            $html .= '</select></div>';
+                        }
+                        /*$js = "<script>init.push(function(){
                             $('select').change(function(){
                                 var params = window.location.search.substring(1);
                                 var paramObject = {};
@@ -549,17 +550,51 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                 window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
                             });
                         })</script>";
-                        $html .= $result . $js;
+                        $html .= $js;*/
                         break;
+                    case 'timePickerGroup':
+                        $timePickerGroup = $data['timePickerGroup'];
+
+                        foreach($timePickerGroup as $index=>$item){
+                            $timeFormat = isset($item['timeFormat']) ? $item['timeFormat']:'Y-m-d H:i:s';
+                            $placeholder = $item['placeholder'];
+                            $html .= '
+                                <div class="col-md-6 col-sm-6" style="padding-left:0px;height: 39px">
+                                    <label class="col-md-3 col-sm-3 text-right" style="line-height: 34px;margin-bottom: 0;">'.$item['text'].'</label>
+                                    <input id="'.$index.'Start" name="'.$index.'Start" type="text"  class="form-control"  style="width: 36.5%;margin-right: 0;display:inline-block;"   value="'.Input::get($index.'Start').'" placeholder="'.$placeholder.'开始"  />
+                                    <span style="display:inline-block;width: 0.3%;">-</span>
+                                    <input id="'.$index.'End" name="'.$index.'End" type="text"  class="form-control"  style="width: 36.5%;margin-right: 0;display:inline-block;"  value="'.Input::get($index.'End').'" placeholder="'.$placeholder.'结束"  />
+                                </div>';
+                            $js = "<script>
+                                        init.push(function(){
+                                            jQuery('#".$index."Start').datetimepicker({format:'".$timeFormat."'});
+                                            jQuery('#".$index."End').datetimepicker({format:'".$timeFormat."'});
+                                        });
+                                    </script>";
+                            $html .= $js;
+                        }
+                        break;
+
                     case 'search' :
                         $search = is_bool($data['search']) ? '请输入您想检索的信息' : $data['search'];
-                        $html .= '<div class="col-md-3" style="padding-left:0px; float: right;width: 17%">
+                        if(is_array($search)){
+                            foreach($search as $item){
+                                $keyword = $item['key'];
+                                $text = $item['text'];
+                                $placeholder = isset($item['placeholder']) ? $item['placeholder'] : '';
+                                $html .= '<div class="col-md-6 col-sm-6" style="padding-left:0px;">
+                                <label class="col-md-3 col-sm-3 text-right control-label" style="line-height: 34px;">'.$text.'</label>
+                                <input id="keywordsInput" type="text" class="form-control input" style="width: 75%;margin-right: 0;display:inline-block;" name="'.$keyword.'" value="' . Input::get($keyword) . '" placeholder="' . $placeholder . '"  />
+                            </div>';
+                            }
+                        }else{
+                            $html .= '<div class="col-md-2" style="padding-left:0px; width: 17%">
                                 <input id="keywordsInput" type="text" class="form-control input" name="keywords" value="' . Input::get('keywords') . '" placeholder="' . $search . '"  />
                             </div>';
-                        $js = "<script>init.push(function(){
+                            $js = "<script>init.push(function(){
                             $('#keywordsInput').keyup(function(event){
                                 if(event.keyCode == 13){
-                                    console.log('do search');
+                                    //console.log('do search');
                                     var params = window.location.search.substring(1);
                                     var paramObject = {};
                                     var paramArray = params.split('&');
@@ -578,8 +613,11 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                     window.location.href = $.param(paramObject) ? baseUrl+'?'+$.param(paramObject) : baseUrl;
                                 }
                             });
-                        });</script>";
-                        $html .= $js;
+                            });</script>";
+                            $html .= $js;
+                        }
+
+
                         break;
                     case 'submit' :
                         $search = is_bool($data['submit']) ? '搜索' : $data['submit'];

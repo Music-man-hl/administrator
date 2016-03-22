@@ -96,7 +96,7 @@
 
 <script src="{{ asset('vendor/forone/components/humane/humane.min.js') }}"></script>
 <script src="{{ asset('vendor/forone/components/remodal/dist/remodal.min.js') }}"></script>
-
+<script src="{{ asset('vendor/forone/components/local-function/asideLoad.js') }}"></script>
 @yield('js')
 
 <script>
@@ -105,6 +105,19 @@
         $(document).on('blur', 'input, textarea', function (e) {
             $(this).val() ? $(this).addClass('has-value') : $(this).removeClass('has-value');
         });
+
+        if (window.localStorage.is_fold == "0") {
+        //若aside控件未折叠则使其折叠
+            if (!($('#aside').hasClass('folded'))) {
+                $('#aside').addClass('folded');
+            }
+        }
+        else {
+        //若aside控件折叠则使其不折叠
+            if ($('#aside').hasClass('folded')) {
+                $('#aside').removeClass('folded');
+            }
+        }
 
     });
 </script>
