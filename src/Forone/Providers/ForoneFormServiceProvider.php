@@ -156,6 +156,7 @@ class ForoneFormServiceProvider extends ServiceProvider
             }
             if($page['currentPage']<$page['lastPage']){
                 $html.='<li><a href="'.$page['path'].$queryString.($page['currentPage']+1).'" rel="next">»</a></li>';
+                $html .= '<li><a href="'.$page['path'].$queryString.$page['lastPage'].'">尾页</a></li>';
             }else{
                 $html.='<li class="disabled"><span>»</span></li>';
             }
