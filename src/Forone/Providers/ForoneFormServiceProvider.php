@@ -33,6 +33,7 @@ class ForoneFormServiceProvider extends ServiceProvider
         $this->formDate();
         $this->formTime();
         $this->formDelete();
+        $this->formNumber();
         $this->ueditor();
         $this->makePager();
     }
@@ -435,5 +436,33 @@ class ForoneFormServiceProvider extends ServiceProvider
                        </a>';
             return $result;
         });
+    }
+
+
+    private function formNumber()
+    {
+        $handler = function ($name, $label, $placeholder = '', $percent = 0.5, $modal = false,$readonly=false,$min=false) {
+            $value = ForoneFormServiceProvider::parseValue($this->model, $name);
+            $data = '';
+            $input_col = 9;
+            if (is_array($placeholder)) {
+                $data = Form::parse($placeholder);
+                $placeholder = $data['placeholder'];
+                $percent = $data['percent'] ? $data['percent'] : 0.5;
+                $modal = $data['modal'] ? true : false;
+                $input_col = $data['label_col'] ? 12 - $data['label_col'] : 9;
+            }
+            $style = $modal ? 'style="padding:0px"' : '';
+            $readonly = $readonly ? "readonly" : "";
+            $isMin = $min?" min='$value' ":'';
+            return '<div class="form-group col-sm-' . ($percent * 12) . '" ' . $style . '>
+                        ' . Form::form_label($label, $data) . '
+                        <div class="col-sm-' . $input_col . '">
+                            <input name="' . $name . '"'.$isMin.' step="0.01" type="number" value="' . $value . '" class="form-control" placeholder="' . $placeholder . '" '.$readonly.'>
+                          </div>
+                    </div>';
+        };
+        Form::macro('group_number', $handler);
+        Form::macro('form_number', $handler);
     }
 }
