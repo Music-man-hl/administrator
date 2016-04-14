@@ -517,16 +517,16 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                             $html .= '<div class="col-md-6 col-sm-6 form-group" style="margin-bottom: 0px;padding-left: 0">
                                         <label class="col-md-3 col-sm-3 text-right" style="line-height: 35px;">'.$value['text'].'</label>
                                         <select class="form-control"  style="width: 75%;margin-right: 0;display:inline-block;" name="' . $key . '">';
-                                            foreach ($value['select'] as $item) {
-                                                $value = is_array($item) ? $item['value'] : $item;
-                                                $label = is_array($item) ? $item['label'] : $item;
-                                                $selected = '';
-                                                $urlValue = Input::get($key);
-                                                if ($urlValue != null) {
-                                                    $selected = $urlValue == $item['value'] ? 'selected="selected"' : '';
-                                                }
-                                                $html .= '<option ' . $selected . ' value="' . $value . '">' . $label . '</option>';
-                                            }
+                            foreach ($value['select'] as $item) {
+                                $value = is_array($item) ? $item['value'] : $item;
+                                $label = is_array($item) ? $item['label'] : $item;
+                                $selected = '';
+                                $urlValue = Input::get($key);
+                                if ($urlValue != null) {
+                                    $selected = $urlValue == $item['value'] ? 'selected="selected"' : '';
+                                }
+                                $html .= '<option ' . $selected . ' value="' . $value . '">' . $label . '</option>';
+                            }
 
                             $html .= '</select></div>';
                         }
@@ -572,6 +572,20 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                         });
                                     </script>";
                             $html .= $js;
+                        }
+                        break;
+                    case 'numberGroup':
+                        $numberGroup = $data['numberGroup'];
+
+                        foreach($numberGroup as $index=>$item){
+                            $placeholder = isset($item['placeholder']) ? $item['placeholder'] : '数值';
+                            $html .= '
+                                <div class="col-md-6 col-sm-6" style="padding-left:0px;height: 39px">
+                                    <label class="col-md-3 col-sm-3 text-right" style="line-height: 34px;margin-bottom: 0;">'.$item['text'].'</label>
+                                    <input id="'.$index.'Min" name="'.$index.'Min" type="number"  class="form-control" style="width: 36.5%;margin-right: 0;display:inline-block;"   value="'.Input::get($index.'Min').'" placeholder="'.$placeholder.'开始"  />
+                                    <span style="display:inline-block;width: 0.3%;">-</span>
+                                    <input id="'.$index.'Max" name="'.$index.'Max" type="number"  class="form-control" style="width: 36.5%;margin-right: 0;display:inline-block;"  value="'.Input::get($index.'Max').'" placeholder="'.$placeholder.'结束"  />
+                                </div>';
                         }
                         break;
 
