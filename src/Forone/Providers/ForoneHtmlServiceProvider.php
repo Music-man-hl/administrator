@@ -582,9 +582,9 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                             $html .= '
                                 <div class="col-md-6 col-sm-6" style="padding-left:0px;height: 39px">
                                     <label class="col-md-3 col-sm-3 text-right" style="line-height: 34px;margin-bottom: 0;">'.$item['text'].'</label>
-                                    <input id="'.$index.'Min" name="'.$index.'Min" type="number"  class="form-control" style="width: 36.5%;margin-right: 0;display:inline-block;"   value="'.Input::get($index.'Min').'" placeholder="'.$placeholder.'开始"  />
+                                    <input id="'.$index.'Min" name="'.$index.'Min" type="number" step="0.0000001" class="form-control" style="width: 36.5%;margin-right: 0;display:inline-block;"   value="'.Input::get($index.'Min').'" placeholder="'.$placeholder.'开始"  />
                                     <span style="display:inline-block;width: 0.3%;">-</span>
-                                    <input id="'.$index.'Max" name="'.$index.'Max" type="number"  class="form-control" style="width: 36.5%;margin-right: 0;display:inline-block;"  value="'.Input::get($index.'Max').'" placeholder="'.$placeholder.'结束"  />
+                                    <input id="'.$index.'Max" name="'.$index.'Max" type="number" step="0.0000001" class="form-control" style="width: 36.5%;margin-right: 0;display:inline-block;"  value="'.Input::get($index.'Max').'" placeholder="'.$placeholder.'结束"  />
                                 </div>';
                         }
                         break;
