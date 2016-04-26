@@ -149,9 +149,14 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                                     $getButton = sizeof($button) > 2 ? true : false;
                                     $config = $getButton ? $button : $button[0];
                                     $data = $getButton ? [] : $button[1];
-                                    if (is_string($data) && strripos($data, '#') == 0) {
-                                        if(!empty($item['id'])){
+                                    if (is_string($data) && !empty($item['id'])) {
+                                        //一般link
+                                        if(strripos($data, '#') !== 0){
+                                            $html .= '<a href="' . $data . '" style="margin-left:5px;"><button  class="btn waves-effect" >' . $config . '</button></a>';
+                                        }elseif($data == '#modal'){//#modal
                                             $html .= Form::modal_button($config, $data, $item);
+                                        }elseif($data == '#alert'){//#alert
+                                            $html .= '<a href="' . $data . '" style="margin-left:5px;"><button  onclick="fillAlert(\'' . $item['id'] . '\')"  class="btn waves-effect" >' . $config . '</button></a>';
                                         }
                                     } else {
                                         if (array_key_exists('method', $config) && $config['method'] == 'GET') {
