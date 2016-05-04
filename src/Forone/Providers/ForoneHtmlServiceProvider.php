@@ -288,9 +288,17 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                             $result .= '<a href="'.$url.'" class="btn btn-warning" style="margin-left:2%">返回</a>';
                             break;
                         case 'button':
-                            $text = $submit_label['button']['text'];
-                            $url = $submit_label['button']['url'];
-                            $result .= '<a href="'.$url.'" class="btn btn-primary" style="margin-left:2%">'.$text.'</a>';
+                            $button = $submit_label['button'];
+                            $text = $button['text'];
+                            if(isset($button['url'])){
+                                $url = $button['url'];
+                                $result .= '<a href="'.$url.'" class="btn btn-primary" style="margin-left:2%">'.$text.'</a>';
+                            }elseif(isset($button['click'])){
+                                $clickAction = $button['click'];
+                                $result .= '<a onclick="'.$clickAction.'" class="btn btn-primary" style="margin-left:2%">'.$text.'</a>';
+
+                            }
+
                             break;
                     }
                 }
