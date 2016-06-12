@@ -361,7 +361,9 @@ class ForoneHtmlServiceProvider extends ServiceProvider
             foreach($dataKeys as $key){
                 switch($key){
                     case 'new' :
-                        $html .= '<a href="' . $this->url->current() . '/create" class="btn btn-primary">&#43; 新增</a>';
+                        $html .= '<div class="col-md-1" style="width: 5% ;margin:0 1px;">
+                        <a href="' . $this->url->current() . '/create" class="btn btn-primary">&#43; 新增</a>
+                        </div>';
                         break;
                     case 'priceStart' :
                         $priceStart = is_bool($data['priceStart']) ? '价格' : $data['priceStart'];
@@ -648,7 +650,7 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                         break;
                     case 'submit' :
                         $search = is_bool($data['submit']) ? '搜索' : $data['submit'];
-                        $html .= '<div class="col-md-1" style="width: 4%">
+                        $html .= '<div class="col-md-1" style="width: 5% ;margin:0 1px;">
                                 <button type="submit" class="btn btn-primary"> '.$search.'</button>
                             </div>';
                         break;
@@ -660,7 +662,7 @@ class ForoneHtmlServiceProvider extends ServiceProvider
                             $text = $search;
                         }
                         $url = isset($search['url']) ? $search['url'] : \URL::previous();
-                        $html .= '<div class="col-md-1" style="width: 5%">
+                        $html .= '<div class="col-md-1" style="width: 6%;margin:0 1px;">
                                 <a class="btn btn-primary" href="'.$url.'"> '.$text.'</a>
                             </div>';
                         break;
