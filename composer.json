@@ -26,7 +26,7 @@
     "php": ">=5.5.9",
     "illuminate/routing": "5.1.*",
     "illuminate/support": "5.1.*",
-    "laravelcollective/html": "5.1.*"
+    "laravelcollective/html": "5.1.*",
     "doctrine/dbal": "^2.5",
     "qiniu/php-sdk": "v7.0.4",
     "orangehill/iseed": "^2.0",
