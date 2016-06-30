@@ -71,7 +71,7 @@ class ForoneServiceProvider extends ServiceProvider
         $this->app->register(\Illuminate\Cache\CacheServiceProvider::class);
 
         $this->app->register(\Illuminate\Translation\TranslationServiceProvider::class);
-        $this->app->register(\Illuminate\Html\HtmlServiceProvider::class);
+        $this->app->register(\Collective\Html\HtmlServiceProvider::class);
         $this->app->register(\Orangehill\Iseed\IseedServiceProvider::class);
 
         $this->app->register(EntrustServiceProvider::class);
@@ -83,8 +83,8 @@ class ForoneServiceProvider extends ServiceProvider
 
     private function registerAlias()
     {
-        $this->app->alias('Form',\Illuminate\Html\FormFacade::class);
-        $this->app->alias('Html',\Illuminate\Html\HtmlFacade::class);
+        $this->app->alias('Form',\Collective\Html\FormFacade::class);
+        $this->app->alias('Html',\Collective\Html\HtmlFacade::class);
         $this->app->alias('Entrust', \Zizaco\Entrust\EntrustFacade::class);
     }
 
