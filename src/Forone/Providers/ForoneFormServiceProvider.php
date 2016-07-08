@@ -465,4 +465,44 @@ class ForoneFormServiceProvider extends ServiceProvider
         Form::macro('group_number', $handler);
         Form::macro('form_number', $handler);
     }
+
+    private function formDistPicker()
+    {
+        $handler = function ($name, $label, $distType = 1, $percent = 0.5) {//$distType 1.省市区 2.省市 3. 省
+
+            $provinceKeyName = $name.'_province' ;
+            $provinceValue = ForoneFormServiceProvider::parseValue($this->model, $provinceKeyName);
+            $provinceText = '<select name="'.$provinceKeyName.'" data-province="'.$provinceValue.'" class="col-sm-6 form-control" style="width: 30%;margin-right: 1%"></select>';
+
+            $cityKeyName = $name.'_city' ;
+            $cityValue = ForoneFormServiceProvider::parseValue($this->model, $cityKeyName);
+            $cityText = '<select name="'.$cityKeyName.'" data-city="'.$cityValue.'" class="col-sm-6 form-control" style="width: 30%;margin-right: 1%"></select>';
+
+            $districtKeyName = $name.'_district' ;
+            $districtValue = ForoneFormServiceProvider::parseValue($this->model, $districtKeyName);
+            $districtText = '<select name="'.$districtKeyName.'" data-district="'.$districtValue.'" class="col-sm-6 form-control" style="width: 30%;margin-right: 1%"></select>';
+
+            $selectText = '';
+            switch($distType){
+                case 3:
+                    $selectText .= $provinceText;
+                    break;
+                case 2:
+                    $selectText .= $provinceText . $cityText;
+                    break;
+                default:
+                    $selectText .= $provinceText . $cityText .$districtText;
+            }
+            $input_col = 12*$percent;
+            return '<div class="form-group col-sm-'.$input_col.'">
+                        <label class="col-sm-3 control-label">'. $label .'</label>
+                        <div data-toggle="distpicker" class="col-sm-9">
+                            '.$selectText.'
+                        </div>
+                    </div>';
+        };
+        Form::macro('group_dist_picker', $handler);
+        Form::macro('form_dist_picker', $handler);
+    }
+
 }
