@@ -97,6 +97,9 @@
 <script src="{{ asset('vendor/forone/components/humane/humane.min.js') }}"></script>
 <script src="{{ asset('vendor/forone/components/remodal/dist/remodal.min.js') }}"></script>
 <script src="{{ asset('vendor/forone/components/local-function/asideLoad.js') }}"></script>
+
+<script src="{{ asset('vendor/forone/scripts/dist/distpicker.data.min.js') }}"></script>
+<script src="{{ asset('vendor/forone/scripts/dist/distpicker.min.js') }}"></script>
 @yield('js')
 
 <script>
