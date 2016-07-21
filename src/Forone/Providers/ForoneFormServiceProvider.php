@@ -410,7 +410,7 @@ class ForoneFormServiceProvider extends ServiceProvider
 
     private function formTime()
     {
-        Form::macro('form_time', function ($name, $label, $placeholder = '', $percent = 0.5) {
+        Form::macro('form_time', function ($name, $label, $placeholder = '', $percent = 0.5,$format = 'Y-m-d H:i') {
             $value = ForoneFormServiceProvider::parseValue($this->model, $name);
             if (!is_string($placeholder)) {
                 $percent = $placeholder;
@@ -419,7 +419,7 @@ class ForoneFormServiceProvider extends ServiceProvider
                         ' . Form::form_label($label) . '
                         <div class="col-sm-9">' .
                 '<input id="' . $name . 'date" name="' . $name . '" type="text" value="' . $value . '" class="form-control" placeholder="' . $placeholder . '">';
-            $js = "<script>init.push(function(){jQuery('#" . $name . "date').datetimepicker({format:'Y-m-d H:i'});})</script>";
+            $js = "<script>init.push(function(){jQuery('#" . $name . "date').datetimepicker({format:'".$format."'});})</script>";
             return $result . '</div></div>' . $js;
         });
     }
