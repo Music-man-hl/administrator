@@ -377,7 +377,9 @@ class ForoneFormServiceProvider extends ServiceProvider
                 $value = is_array($item) ? $item['value'] : $item;
                 $label = is_array($item) ? $item['label'] : $item;
                 $selected = '';
-                if ($this->model) {
+                if (\Input::old()) {
+                    $result .= '<option ' . (in_array($value, \Input::old($name)) ? 'selected' : '') . ' value="' . $value . '">' . $label . '</option>';
+                }if ($this->model) {
                     if (isset($this->model[$name])) {
                         $type_ids = explode(',', $this->model[$name]);
                     } else {
