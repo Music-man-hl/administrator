@@ -36,6 +36,7 @@ class ForoneFormServiceProvider extends ServiceProvider
         $this->formNumber();
         $this->ueditor();
         $this->makePager();
+        $this->formDistPicker();
     }
 
     public static function parseValue($model, $name)
