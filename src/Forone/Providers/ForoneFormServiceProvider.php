@@ -141,7 +141,10 @@ class ForoneFormServiceProvider extends ServiceProvider
                 $html.='<li><a href="'.$page['path'].$queryString.($page['currentPage']-1).'" >«</a></li>';
             }
             $active=false;
-            for($i=1;$i<=12;$i++){
+            $i = $page['currentPage'] - 5 > 5 ? $page['currentPage'] - 5 : 1;
+            $totalPage = ceil($page['total']/$page['perPage']);
+            $j = $page['currentPage'] + 5 < $totalPage  ? $page['currentPage'] + 5 : $totalPage;
+            for($i;$i<=$j;$i++){
                 if($page['lastPage']>=$i){
                     if($page['currentPage']==$i){
                         $active=true;
