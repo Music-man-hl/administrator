@@ -36,7 +36,9 @@ $BUCKET = isset($envData['QINIU_BT'])?$envData['QINIU_BT']:'center';
 //配置你的域名访问地址
 $HOST  = isset($envData['QINIU_HOST'])?$envData['QINIU_HOST']:'http://7xosqo.com1.z0.glb.clouddn.com';;
 //$HOST  = 'http://7xosqo.com1.z0.glb.clouddn.com';
-
+if(substr($HOST,-1,1)=='/'){
+    $HOST = substr($HOST,0,-1);
+}
 //上传超时时间
 $TIMEOUT = "3600";
 
