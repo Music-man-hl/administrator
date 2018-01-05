@@ -1,5 +1,5 @@
 {
-  "name": "aishan/administrator",
+  "name": "Music-man-hl/administrator",
   "description": "Admin system based on Laravel 5.5",
   "homepage": "https://github.com/Music-man-hl/administrator",
   "keywords": ["laravel 5.5", "forone", "admin"],
@@ -24,7 +24,7 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/aishan/ForoneAdministrator/issues"
+    "issues": "https://github.com/Music-man-hl/administrator/issues"
   },
   "require": {
     "php": ">=5.5.9",
