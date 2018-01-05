@@ -1,8 +1,8 @@
 {
   "name": "aishan/administrator",
-  "description": "Admin system based on Laravel 5.1",
-  "homepage": "https://github.com/aishan/ForoneAdministrator",
-  "keywords": ["laravel 5", "forone", "admin"],
+  "description": "Admin system based on Laravel 5.5",
+  "homepage": "https://github.com/Music-man-hl/administrator",
+  "keywords": ["laravel 5.5", "forone", "admin"],
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -17,6 +17,10 @@
     {
       "name": "Ai Shan",
       "email": "aishan520315@163.com"
+    },
+    {
+      "name": "diaodiao",
+      "email": "yodiaodiao@gmail.com"
     }
   ],
   "support": {
